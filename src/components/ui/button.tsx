@@ -18,12 +18,18 @@ const buttonVariants = cva(
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
+        golf: "bg-gradient-golf text-white hover:shadow-golf-score transition-all duration-300 border-0",
+        score: "bg-golf-green/10 text-golf-green border border-golf-green/30 hover:bg-golf-green hover:text-white transition-all duration-200 rounded-full",
+        "score-selected": "bg-gradient-score-good text-white shadow-golf-score border-0 rounded-full",
+        "score-under": "bg-gradient-score-good text-white hover:shadow-golf-score transition-all duration-200 rounded-full",
+        "score-over": "bg-gradient-score-bad text-white hover:shadow-golf-score transition-all duration-200 rounded-full",
       },
       size: {
         default: "h-10 px-4 py-2",
         sm: "h-9 rounded-md px-3",
         lg: "h-11 rounded-md px-8",
         icon: "h-10 w-10",
+        score: "h-8 w-8 p-0 text-xs",
       },
     },
     defaultVariants: {

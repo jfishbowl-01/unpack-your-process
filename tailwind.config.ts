@@ -61,7 +61,30 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				golf: {
+					green: 'hsl(var(--golf-green))',
+					'green-light': 'hsl(var(--golf-green-light))',
+					'green-dark': 'hsl(var(--golf-green-dark))',
+					fairway: 'hsl(var(--golf-fairway))',
+					sand: 'hsl(var(--golf-sand))',
+					sky: 'hsl(var(--golf-sky))',
+					earth: 'hsl(var(--golf-earth))'
 				}
+			},
+			backgroundImage: {
+				'gradient-golf': 'var(--gradient-golf)',
+				'gradient-fairway': 'var(--gradient-fairway)',
+				'gradient-score-good': 'var(--gradient-score-good)',
+				'gradient-score-bad': 'var(--gradient-score-bad)'
+			},
+			boxShadow: {
+				golf: 'var(--shadow-golf)',
+				'golf-card': 'var(--shadow-card)',
+				'golf-score': 'var(--shadow-score)'
+			},
+			transitionTimingFunction: {
+				golf: 'var(--transition-golf)'
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
