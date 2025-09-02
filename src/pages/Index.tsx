@@ -2,18 +2,23 @@ import React, { useState } from 'react';
 import GolfScorecard from '@/components/GolfScorecard';
 import TournamentDashboard from '@/components/TournamentDashboard';
 import TournamentResults from '@/components/TournamentResults';
+import TournamentManagement from '@/components/TournamentManagement';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 import { sampleTournament, samplePlayers, sampleCourses, sampleResults, getCourseById } from '@/data/sampleData';
-import { Player } from '@/types/golf';
+import { Player, Tournament, TournamentResults as TournamentResultsType } from '@/types/golf';
+import { calculateEnhancedClassResults, generateWinnerAnnouncements } from '@/utils/golfCalculations';
 
-type AppView = 'welcome' | 'dashboard' | 'scorecard' | 'results';
+type AppView = 'welcome' | 'dashboard' | 'scorecard' | 'results' | 'management';
 
 const Index = () => {
   const [currentView, setCurrentView] = useState<AppView>('welcome');
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
+  const [tournamentData, setTournamentData] = useState<Tournament>(sampleTournament);
+  const [resultsData, setResultsData] = useState<TournamentResultsType | null>(sampleResults);
   
-  const course = getCourseById(sampleTournament.courseId);
+  const course = getCourseById(tournamentData.courseId);
   
   if (!course) {
     return <div>Course not found</div>;
@@ -22,6 +27,31 @@ const Index = () => {
   const handleScoreUpdate = (playerId: string, hole: number, score: number) => {
     console.log(`Player ${playerId} scored ${score} on hole ${hole}`);
     // In a real app, this would update the backend/state
+    toast.success(`Score updated: Hole ${hole} - ${score} strokes`);
+  };
+
+  const handleClearData = () => {
+    // Clear all score data but keep tournament setup
+    toast.success("Score data cleared successfully");
+    // In real app: would clear scores from database
+  };
+
+  const handleResetTournament = () => {
+    // Reset entire tournament to initial state
+    setTournamentData(sampleTournament);
+    setResultsData(sampleResults);
+    setSelectedPlayer(null);
+    setCurrentView('dashboard');
+    toast.success("Tournament reset to initial state");
+  };
+
+  const handleExportResults = () => {
+    // Export results to CSV/PDF
+    if (resultsData) {
+      const winnerAnnouncements = generateWinnerAnnouncements(resultsData.classResults);
+      console.log('Exporting results:', winnerAnnouncements);
+      toast.success("Results exported successfully");
+    }
   };
 
   const renderCurrentView = () => {
@@ -71,14 +101,18 @@ const Index = () => {
                     
                     <div className="mt-8 p-6 bg-golf-green/5 rounded-lg border border-golf-green/20">
                       <h3 className="font-bold text-golf-green-dark mb-3">🎮 Demo Features Available:</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                        <div>✅ Live tournament dashboard with 10 sample players</div>
-                        <div>✅ Class A, B, C, and Senior divisions</div>
-                        <div>✅ 18-hole skins competition with tie handling</div>
-                        <div>✅ 6-corner competition (3-hole segments)</div>
-                        <div>✅ Digital scorecard with handicap calculations</div>
-                        <div>✅ Complete tournament results and leaderboards</div>
-                      </div>
+                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                         <div>✅ Live tournament dashboard with 10 sample players</div>
+                         <div>✅ Class A, B, C, and Senior divisions</div>
+                         <div>✅ 18-hole skins competition with tie handling</div>
+                         <div>✅ 6-corner competition (3-hole segments)</div>
+                         <div>✅ Digital scorecard with handicap calculations</div>
+                         <div>✅ Complete tournament results and leaderboards</div>
+                         <div>✅ Enhanced VBA-inspired tournament management</div>
+                         <div>✅ Winner announcements with member recognition</div>
+                         <div>✅ Data validation and tournament statistics</div>
+                         <div>✅ Consolidated competition results tracking</div>
+                       </div>
                     </div>
                   </CardContent>
                 </Card>
@@ -131,14 +165,11 @@ const Index = () => {
       case 'dashboard':
         return (
           <TournamentDashboard
-            tournament={sampleTournament}
+            tournament={tournamentData}
             course={course}
             onStartScoring={() => setCurrentView('scorecard')}
             onViewResults={() => setCurrentView('results')}
-            onManageSettings={() => {
-              // Would open settings in real app
-              console.log('Opening tournament settings...');
-            }}
+            onManageSettings={() => setCurrentView('management')}
           />
         );
         
@@ -154,7 +185,7 @@ const Index = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {sampleTournament.players.map(player => (
+                    {tournamentData.players.map(player => (
                       <Button
                         key={player.id}
                         variant="outline"
@@ -192,7 +223,7 @@ const Index = () => {
                 <GolfScorecard
                   player={selectedPlayer}
                   course={course}
-                  tournament={sampleTournament}
+                  tournament={tournamentData}
                   onScoreUpdate={handleScoreUpdate}
                 />
               </div>
@@ -203,10 +234,34 @@ const Index = () => {
       case 'results':
         return (
           <TournamentResults
-            results={sampleResults}
-            tournamentName={sampleTournament.name}
+            results={resultsData || sampleResults}
+            tournamentName={tournamentData.name}
             onBack={() => setCurrentView('dashboard')}
           />
+        );
+
+      case 'management':
+        return (
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h1 className="text-3xl font-bold text-golf-green-dark">Tournament Management</h1>
+              <Button 
+                variant="outline" 
+                onClick={() => setCurrentView('dashboard')}
+                className="flex items-center gap-2"
+              >
+                ← Back to Dashboard
+              </Button>
+            </div>
+            
+            <TournamentManagement
+              tournament={tournamentData}
+              results={resultsData}
+              onClearData={handleClearData}
+              onResetTournament={handleResetTournament}
+              onExportResults={handleExportResults}
+            />
+          </div>
         );
         
       default:
